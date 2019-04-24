@@ -3,6 +3,7 @@ import {addCommand, getCommandHistory} from "../repositories/command-repository"
 export enum CommandType {
     CREATE,
     OPEN,
+    EDIT,
     UNKNOWN
 }
 
@@ -24,6 +25,9 @@ export const parseCommand = (command: string): Command => {
     } else if (trimmed.indexOf("Open ") === 0) {
         const fileName = trimmed.split(' ')[1];
         return { type: CommandType.OPEN, args: { fileName: fileName} }
+    } else if (trimmed.indexOf("Edit ") === 0) {
+        const fileName = trimmed.split(' ')[1];
+        return { type: CommandType.EDIT, args: { fileName: fileName} }
     }
     return { type: CommandType.UNKNOWN, args: undefined };
 };

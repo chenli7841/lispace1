@@ -31,3 +31,13 @@ export const getFileContent = (fileName: string): string[] | undefined => {
         return undefined;
     }
 };
+
+export const updateFileContent = (fileName: string, content: string[]): string[] | undefined => {
+    const file = window.localStorage.getItem('file_' + fileName);
+    if (file) {
+        window.localStorage.setItem('file_' + fileName, JSON.stringify(content));
+        return content;
+    } else {
+        return undefined;
+    }
+};
