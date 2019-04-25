@@ -8,6 +8,8 @@ export default function HtmlEditor() {
     const [file, setFile] = useState({title: '', paragraphs: []} as File);
     const [top, setTop] = useState(40);
     const [left, setLeft] = useState(40);
+    const [width, setWidth] = useState(400);
+    const [height, setHeight] = useState(650);
     const [show, setShow] = useState(false);
     const [edit, setEdit] = useState(false);
     const [newInput, setNewInput] = useState('');
@@ -27,6 +29,12 @@ export default function HtmlEditor() {
                         setShow(true);
                         setFile({title: lastCommand.args.fileName, paragraphs: paragraphs!});
                     }
+                    break;
+                case CommandType.SETWIDTH:
+                    setWidth(lastCommand.args.width);
+                    break;
+                case CommandType.SETHEIGHT:
+                    setHeight(lastCommand.args.height);
                     break;
             }
         }
@@ -58,38 +66,45 @@ export default function HtmlEditor() {
                     setShow(true);
                 }
                 break;
+            case CommandType.SETWIDTH:
+                setWidth(command.args.width);
+                break;
+            case CommandType.SETHEIGHT:
+                setHeight(command.args.height);
+                break;
         }
     };
 
     const getParagraphs = (paragraphs: string[]) => paragraphs.map((p, i) => <p key={i}>{p}</p>);
 
-    const onInputChange = (e: React.FormEvent<HTMLTextAreaElement>) => {
-        setNewInput(e.currentTarget.value);
+    const onInputChange = (e: React.FormEvent<HTMLDivElement>) => {
+        const text = e.currentTarget.innerText;
+        setNewInput(text);
     };
 
-    const onTypeEnter = (e: React.FormEvent<HTMLTextAreaElement>) => {
+    const onTypeEnter = (e: React.FormEvent<HTMLDivElement>) => {
         const event: any = e.nativeEvent;
         if (event.key !== 'Enter') return;
         e.nativeEvent.preventDefault();
         if (newInput.trim() === '') return;
         const allContent = updateFileContent(file.title, [...file.paragraphs, newInput]);
-        console.log(allContent);
         if (allContent) {
             setFile({title: file.title, paragraphs: allContent!});
             setNewInput('');
+            e.currentTarget.innerText = '';
         }
     };
 
     const getEditor = () => {
         if (edit) {
-            return <textarea className='html-editor-input' value={newInput} onChange={onInputChange} onKeyDown={onTypeEnter} />;
+            return <div className='html-editor-input' contentEditable={true} onKeyUp={onInputChange} onKeyDown={onTypeEnter} />;
         } else {
             return null;
         }
     };
 
     const render = () => {
-        if (show) return <div style={{left: left + 'px', top: top + 'px'}} className='html-editor-box'>
+        if (show) return <div style={{left: left + 'px', top: top + 'px', width: width + 'px', height: height + 'px'}} className='html-editor-box'>
             <h3>{file.title}</h3>
             <div>
                 {getParagraphs(file.paragraphs)}

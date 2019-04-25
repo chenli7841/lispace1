@@ -4,6 +4,8 @@ export enum CommandType {
     CREATE,
     OPEN,
     EDIT,
+    SETWIDTH,
+    SETHEIGHT,
     UNKNOWN
 }
 
@@ -28,6 +30,12 @@ export const parseCommand = (command: string): Command => {
     } else if (trimmed.indexOf("Edit ") === 0) {
         const fileName = trimmed.split(' ')[1];
         return { type: CommandType.EDIT, args: { fileName: fileName} }
+    } else if (trimmed.indexOf("Set width ") === 0) {
+        const width = trimmed.replace('Set width ', '').trim();
+        return { type: CommandType.SETWIDTH, args: { width: width }};
+    } else if (trimmed.indexOf("Set height ") === 0) {
+        const height = trimmed.replace('Set height ', '').trim();
+        return { type: CommandType.SETHEIGHT, args: { height: height }};
     }
     return { type: CommandType.UNKNOWN, args: undefined };
 };
