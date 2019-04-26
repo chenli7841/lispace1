@@ -1,7 +1,14 @@
 import React, {useEffect, useRef, useState} from 'react';
 import './command-dialog.css';
-import {CommandText, submitCommand, subscribeToCommandHistory} from "../../services/command-service";
+import {
+    Command,
+    CommandText,
+    CommandType,
+    submitCommand, subscribeToCommand,
+    subscribeToCommandHistory
+} from "../../services/command-service";
 import {getCommandHistory} from "../../repositories/command-repository";
+import {getFileNames} from "../../repositories/file-repository";
 
 interface Param {
     screenX: string,
@@ -30,6 +37,8 @@ export default function CommandDialog(param: Param) {
                 };
                 setStyle(newStyle);
             }
+            subscribeToCommandHistory(onUpdateHistory);
+            subscribeToCommand(onNewCommand);
         },
         /*
         Empty array means only after initial render
@@ -51,6 +60,12 @@ export default function CommandDialog(param: Param) {
         });
     }, [param.screenX, param.screenY]);
 
+    const onNewCommand = (command: Command) => {
+        if (command.type === CommandType.LISTFILES) {
+            submitCommand({text: getFileNames().join(' '), type: 'response', id: 0});
+        }
+    };
+
     const onDragStart = (e: any) => {
         setInitializing(false);
         setInitialX(parseInt(e.nativeEvent.screenX));
@@ -59,7 +74,7 @@ export default function CommandDialog(param: Param) {
 
     const onSubmit = (e: any) => {
         if (e.nativeEvent.code === 'Enter') {
-            submitCommand(command);
+            submitCommand({text: command, type: "command", id: 0});
             setCommand('');
         }
     };
@@ -72,10 +87,14 @@ export default function CommandDialog(param: Param) {
         setHistory(history);
     };
 
-    subscribeToCommandHistory(onUpdateHistory);
-
     const getHistory = () => {
-        return history.map(command => <div key={command.id}>&gt; {command.text}</div>);
+        return history.map(command => {
+            if (command.type === 'command') {
+                return <div key={command.id}>&gt; {command.text}</div>;
+            } else if (command.type === "response") {
+                return <div key={command.id}>{command.text}</div>;
+            }
+        });
     };
 
     return <div draggable

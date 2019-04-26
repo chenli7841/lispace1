@@ -17,14 +17,11 @@ export default function HtmlEditor() {
     useEffect(() => {
         subscribeToCommand(onNewCommand);
         const lastCommand = getLastCommand();
+        let paragraphs: string[] | undefined = undefined;
         if (lastCommand) {
             switch (lastCommand.type) {
-                case CommandType.CREATE:
-                    addNewFile({title: lastCommand.args.fileName, paragraphs: []});
-                    setFile({title: lastCommand.args.fileName, paragraphs: []});
-                    break;
                 case CommandType.OPEN:
-                    const paragraphs: string[] | undefined = getFileContent(lastCommand.args.fileName);
+                    paragraphs = getFileContent(lastCommand.args.fileName);
                     if (paragraphs) {
                         setShow(true);
                         setFile({title: lastCommand.args.fileName, paragraphs: paragraphs!});
@@ -36,6 +33,15 @@ export default function HtmlEditor() {
                 case CommandType.SETHEIGHT:
                     setHeight(lastCommand.args.height);
                     break;
+                case CommandType.EDIT:
+                    paragraphs = getFileContent(lastCommand.args.fileName);
+                    if (paragraphs) {
+                        setFile({title: lastCommand.args.fileName, paragraphs: paragraphs!});
+                        setEdit(true);
+                        setShow(true);
+                    }
+                    break;
+
             }
         }
 

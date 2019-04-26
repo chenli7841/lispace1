@@ -6,9 +6,9 @@ export const getCommandHistory = (): CommandText[] => {
 
 let nextIndex = getCommandHistory().length + 1;
 
-export const addCommand = (commandText: string) => {
+export const addCommand = (commandText: CommandText) => {
     const commandHistory = JSON.parse(window.localStorage['commandHistory'] || '[]') || [];
-    commandHistory.push({text: commandText, id: nextIndex} as CommandText);
+    commandHistory.push({...commandText, id: nextIndex} as CommandText);
     window.localStorage.setItem('commandHistory', JSON.stringify(commandHistory));
     nextIndex++;
 };

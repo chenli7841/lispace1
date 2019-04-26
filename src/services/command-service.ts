@@ -6,6 +6,7 @@ export enum CommandType {
     EDIT,
     SETWIDTH,
     SETHEIGHT,
+    LISTFILES,
     UNKNOWN
 }
 
@@ -16,6 +17,7 @@ export interface Command {
 
 export interface CommandText {
     id: number,
+    type: 'command' | 'response',
     text: string
 }
 
@@ -36,6 +38,8 @@ export const parseCommand = (command: string): Command => {
     } else if (trimmed.indexOf("Set height ") === 0) {
         const height = trimmed.replace('Set height ', '').trim();
         return { type: CommandType.SETHEIGHT, args: { height: height }};
+    } else if (trimmed === "List file names") {
+        return { type: CommandType.LISTFILES, args: undefined };
     }
     return { type: CommandType.UNKNOWN, args: undefined };
 };
@@ -51,9 +55,10 @@ export const subscribeToCommandHistory = (subscriber: (commandHistory: CommandTe
     commandHistorySubscribers.push(subscriber);
 };
 
-export const submitCommand = (command: string) => {
+export const submitCommand = (command: CommandText) => {
     addCommand(command);
-    const parsedCommand: Command = parseCommand(command);
+    if (command.type === 'response') return;
+    const parsedCommand: Command = parseCommand(command.text);
     commandSubscribers.forEach((subscriber: ((command: Command) => any)) => {
         subscriber(parsedCommand);
     });
