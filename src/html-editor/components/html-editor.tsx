@@ -81,7 +81,24 @@ export default function HtmlEditor() {
         }
     };
 
-    const getParagraphs = (paragraphs: string[]) => paragraphs.map((p, i) => <p key={i}>{p}</p>);
+    const getParagraphs = (paragraphs: string[]) => paragraphs
+        .map((p, i) =>
+            <p className='html-editor-paragraph'
+               onBlur={onUpdateParagraph(i)} onClick={onEditParagraph} contentEditable={false} key={i}>{p}</p>
+        );
+
+    const onUpdateParagraph = (i: number) => (e: React.FormEvent<HTMLParagraphElement>) => {
+        e.currentTarget.contentEditable = 'false';
+        const newFile = {...file};
+        newFile.paragraphs = [...file.paragraphs];
+        newFile.paragraphs[i] = e.currentTarget.innerText;
+        updateFileContent(newFile.title, newFile.paragraphs);
+        setFile(newFile);
+    };
+
+    const onEditParagraph = (e: React.FormEvent<HTMLParagraphElement>) => {
+        e.currentTarget.contentEditable = 'true';
+    };
 
     const onInputChange = (e: React.FormEvent<HTMLDivElement>) => {
         const text = e.currentTarget.innerText;
