@@ -1,0 +1,54 @@
+.button2 {
+    position: relative;
+    padding: 8px 20px;
+    color: #3f51b5;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 20px;
+    text-align: center;
+    background: transparent;
+    border: 0;
+    border: none;
+    outline: 0;
+}
+
+.button2-ripple {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: transparent;
+}
+
+.button2-ripple-circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(192, 192, 192, .25);
+}
+
+.button2-is-active {
+    animation: button2-a-ripple 0.4s ease-out;
+}
+
+@keyframes button2-a-ripple {
+    0% {
+        opacity: 0;
+    }
+    15% {
+        opacity: 1;
+    }
+
+    100% {
+        width: 200%;
+        padding-bottom: 200%;
+        opacity: 1;
+    }
+}

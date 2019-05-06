@@ -7,6 +7,7 @@ export enum CommandType {
     SETWIDTH,
     SETHEIGHT,
     LISTFILES,
+    CLOSE,
     UNKNOWN
 }
 
@@ -25,9 +26,21 @@ export const parseCommand = (command: string): Command => {
     let trimmed = command.trim();
     if (trimmed.indexOf("Create ") === 0) {
         const fileName = trimmed.split(' ')[1];
-        return { type: CommandType.CREATE, args: { fileName: fileName} }
+        if (fileName.indexOf('.') >= 0) {
+            const ext = fileName.split('.')[1];
+            if (ext !== '') {
+                return { type: CommandType.CREATE, args: { fileName: fileName, ext: ext } }
+            }
+        }
+        return { type: CommandType.CREATE, args: { fileName: fileName } }
     } else if (trimmed.indexOf("Open ") === 0) {
         const fileName = trimmed.split(' ')[1];
+        if (fileName.indexOf('.') >= 0) {
+            const ext = fileName.split('.')[1];
+            if (ext !== '') {
+                return { type: CommandType.OPEN, args: { fileName: fileName, ext: ext } }
+            }
+        }
         return { type: CommandType.OPEN, args: { fileName: fileName} }
     } else if (trimmed.indexOf("Edit ") === 0) {
         const fileName = trimmed.split(' ')[1];
@@ -40,6 +53,8 @@ export const parseCommand = (command: string): Command => {
         return { type: CommandType.SETHEIGHT, args: { height: height }};
     } else if (trimmed === "List file names") {
         return { type: CommandType.LISTFILES, args: undefined };
+    } else if (trimmed === "Close") {
+        return { type: CommandType.CLOSE, args: undefined };
     }
     return { type: CommandType.UNKNOWN, args: undefined };
 };

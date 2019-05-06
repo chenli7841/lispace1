@@ -41,7 +41,9 @@ export default function HtmlEditor() {
                         setShow(true);
                     }
                     break;
-
+                case CommandType.CLOSE:
+                    setShow(false);
+                    break;
             }
         }
 
@@ -51,17 +53,21 @@ export default function HtmlEditor() {
         let paragraphs: string[] | undefined = undefined;
         switch (command.type) {
             case CommandType.CREATE:
-                addNewFile({title: command.args.fileName, paragraphs: []});
-                setFile({title: command.args.fileName, paragraphs: []});
-                setEdit(true);
-                setShow(true);
+                if (command.args.ext === undefined || command.args.ext === 'txt') {
+                    addNewFile({title: command.args.fileName, paragraphs: []});
+                    setFile({title: command.args.fileName, paragraphs: []});
+                    setEdit(true);
+                    setShow(true);
+                }
                 break;
             case CommandType.OPEN:
-                paragraphs = getFileContent(command.args.fileName);
-                if (paragraphs) {
-                    setFile({title: command.args.fileName, paragraphs: paragraphs!});
-                    setEdit(false);
-                    setShow(true);
+                if (command.args.ext === undefined || command.args.ext === 'txt') {
+                    paragraphs = getFileContent(command.args.fileName);
+                    if (paragraphs) {
+                        setFile({title: command.args.fileName, paragraphs: paragraphs!});
+                        setEdit(false);
+                        setShow(true);
+                    }
                 }
                 break;
             case CommandType.EDIT:
@@ -77,6 +83,9 @@ export default function HtmlEditor() {
                 break;
             case CommandType.SETHEIGHT:
                 setHeight(command.args.height);
+                break;
+            case CommandType.CLOSE:
+                setShow(false);
                 break;
         }
     };
@@ -128,7 +137,7 @@ export default function HtmlEditor() {
 
     const render = () => {
         if (show) return <div style={{left: left + 'px', top: top + 'px', width: width + 'px', height: height + 'px'}} className='html-editor-box'>
-            <h3>{file.title}</h3>
+            <h2>{file.title}</h2>
             <div>
                 {getParagraphs(file.paragraphs)}
                 {getEditor()}
