@@ -8,6 +8,8 @@ export enum CommandType {
     SETHEIGHT,
     LISTFILES,
     CLOSE,
+    HIDEHISTORY,
+    SHOWHISTORY,
     UNKNOWN
 }
 
@@ -55,9 +57,25 @@ export const parseCommand = (command: string): Command => {
         return { type: CommandType.LISTFILES, args: undefined };
     } else if (trimmed === "Close") {
         return { type: CommandType.CLOSE, args: undefined };
+    } else if (trimmed === "Hide history") {
+        return { type: CommandType.HIDEHISTORY, args: undefined };
+    } else if (trimmed === "Show history") {
+        return { type: CommandType.SHOWHISTORY, args: undefined };
     }
     return { type: CommandType.UNKNOWN, args: undefined };
 };
+
+export const sampleCommand = [
+    'Create fileOne',
+    'Open fileOne',
+    'Edit fileOne',
+    'Set width 500',
+    'Set height 500',
+    'List file names',
+    'Close',
+    'Hide history',
+    'Show history'
+];
 
 const commandSubscribers: Array<(command: Command) => any> = [];
 const commandHistorySubscribers: Array<(commandHistory: CommandText[]) => any> = [];

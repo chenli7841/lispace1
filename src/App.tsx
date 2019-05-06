@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import './App.css';
 import CommandDialog from "./command/components/command-dialog";
 import HtmlEditor from "./html-editor/components/html-editor";
-import CardEditor from "./card-editor/components/card-editor";
+import WordCardEditor from "./word-card-editor/components/word-card-editor";
 
 export default function App() {
 
@@ -22,7 +22,7 @@ export default function App() {
     backgroundSize: 'cover', backgroundPosition: 'center'}} onDragOver={onDragOver}
   onDrop={onDrop}>
     <HtmlEditor />
-    <CardEditor />
+    <WordCardEditor />
     <CommandDialog screenX={screenX} screenY={screenY}/>
   </div>
 }

@@ -4,7 +4,9 @@ import {
     Command,
     CommandText,
     CommandType,
-    submitCommand, subscribeToCommand,
+    getLastCommand, sampleCommand,
+    submitCommand,
+    subscribeToCommand,
     subscribeToCommandHistory
 } from "../../services/command-service";
 import {getCommandHistory} from "../../repositories/command-repository";
@@ -21,12 +23,13 @@ export default function CommandDialog(param: Param) {
     const [ initialX, setInitialX ] = useState(0);
     const [ initialY, setInitialY ] = useState(0);
     const [ style, setStyle ] = useState({});
+    const [ minimize, setMinimize ] = useState(false);
+    const [ showSample, setShowSample ] = useState(false);
     const [ initializing, setInitializing ] = useState(true);
     const [ command, setCommand ] = useState('');
     const [ history, setHistory ] = useState(getCommandHistory());
     const ref = useRef(null);
-    useEffect(() =>
-        {
+    useEffect(() => {
             if (ref.current) {
                 const elem: HTMLDivElement = ref.current!;
                 setDialogLeft(elem.offsetLeft);
@@ -39,6 +42,17 @@ export default function CommandDialog(param: Param) {
             }
             subscribeToCommandHistory(onUpdateHistory);
             subscribeToCommand(onNewCommand);
+            const command: Command | undefined = getLastCommand();
+            if (command) {
+                switch (command.type) {
+                    case CommandType.HIDEHISTORY:
+                        setMinimize(true);
+                        break;
+                    case CommandType.SHOWHISTORY:
+                        setMinimize(false);
+                        break;
+                }
+            }
         },
         /*
         Empty array means only after initial render
@@ -61,8 +75,16 @@ export default function CommandDialog(param: Param) {
     }, [param.screenX, param.screenY]);
 
     const onNewCommand = (command: Command) => {
-        if (command.type === CommandType.LISTFILES) {
-            submitCommand({text: getFileNames().join(' '), type: 'response', id: 0});
+        switch (command.type) {
+            case CommandType.LISTFILES:
+                submitCommand({text: getFileNames().join(' '), type: 'response', id: 0});
+                break;
+            case CommandType.HIDEHISTORY:
+                setMinimize(true);
+                break;
+            case CommandType.SHOWHISTORY:
+                setMinimize(false);
+                break;
         }
     };
 
@@ -87,23 +109,53 @@ export default function CommandDialog(param: Param) {
         setHistory(history);
     };
 
+    const toggleListSampleCommand = () => {
+        setShowSample(!showSample);
+    };
+
+    const onSelectSampleCommand = (cmd: string) => () => {
+        setCommand(cmd);
+        setShowSample(false);
+    };
+
+    const getListItems = () => {
+        if (showSample) {
+            return <div className='command-dialog-list-items'>
+                {
+                    sampleCommand.map((cmd, i) =>
+                        <div key={i} className='command-dialog-list-item' onClick={onSelectSampleCommand(cmd)}>{cmd}</div>)
+                }
+            </div>;
+        } else {
+            return null;
+        }
+    };
+
     const getHistory = () => {
-        return history.map(command => {
-            if (command.type === 'command') {
-                return <div key={command.id}>&gt; {command.text}</div>;
-            } else if (command.type === "response") {
-                return <div key={command.id}>{command.text}</div>;
-            }
-        });
+        const getItems = () => {
+            return history.map(command => {
+                if (command.type === 'command') {
+                    return <div key={command.id}>&gt; {command.text}</div>;
+                } else if (command.type === "response") {
+                    return <div key={command.id}>{command.text}</div>;
+                }
+            });
+        };
+        if (minimize)
+            return null;
+        else
+            return <div className='command-dialog-history'>{getItems()}</div>;
     };
 
     return <div draggable
                 onDragStart={onDragStart}
                 style={style} className='command-dialog' ref={ref}>
-        <div className='command-dialog-header'/>
-        <div className='command-dialog-history'>
-            {getHistory()}
+        {getHistory()}
+        <div className='command-dialog-input-row'>
+            <span>$</span>
+            <input type="text" onKeyDown={onSubmit} value={command} onChange={onInput} className='command-dialog-input'/>
+            <button className='command-dialog-list-button' onClick={toggleListSampleCommand}>&#9660;</button>
+            {getListItems()}
         </div>
-        <div className='command-dialog-input-row'><span>$</span><input type="text" onKeyDown={onSubmit} value={command} onChange={onInput} className='command-dialog-input'/></div>
     </div>
 }
