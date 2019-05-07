@@ -21,10 +21,12 @@ export default function HtmlEditor() {
         if (lastCommand) {
             switch (lastCommand.type) {
                 case CommandType.OPEN:
-                    paragraphs = getFileContent(lastCommand.args.fileName);
-                    if (paragraphs) {
-                        setShow(true);
-                        setFile({title: lastCommand.args.fileName, paragraphs: paragraphs!});
+                    if (lastCommand.args.ext === undefined || lastCommand.args.ext === 'txt') {
+                        paragraphs = getFileContent(lastCommand.args.fileName);
+                        if (paragraphs) {
+                            setShow(true);
+                            setFile({title: lastCommand.args.fileName, paragraphs: paragraphs!});
+                        }
                     }
                     break;
                 case CommandType.SETWIDTH:
@@ -53,12 +55,10 @@ export default function HtmlEditor() {
         let paragraphs: string[] | undefined = undefined;
         switch (command.type) {
             case CommandType.CREATE:
-                if (command.args.ext === undefined || command.args.ext === 'txt') {
-                    addNewFile({title: command.args.fileName, paragraphs: []});
-                    setFile({title: command.args.fileName, paragraphs: []});
-                    setEdit(true);
-                    setShow(true);
-                }
+                addNewFile({title: command.args.fileName, paragraphs: []});
+                setFile({title: command.args.fileName, paragraphs: []});
+                setEdit(true);
+                setShow(true);
                 break;
             case CommandType.OPEN:
                 if (command.args.ext === undefined || command.args.ext === 'txt') {
@@ -114,7 +114,7 @@ export default function HtmlEditor() {
         setNewInput(text);
     };
 
-    const onTypeEnter = (e: React.FormEvent<HTMLDivElement>) => {
+    const onTypeEnter = (e: React.KeyboardEvent<HTMLDivElement>) => {
         const event: any = e.nativeEvent;
         if (event.key !== 'Enter') return;
         e.nativeEvent.preventDefault();
