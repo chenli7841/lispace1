@@ -11,6 +11,7 @@ import {
 } from "../../services/command-service";
 import {getCommandHistory} from "../../repositories/command-repository";
 import {getFileNames} from "../../repositories/file-repository";
+import {getDimension, updateDimension} from "../../repositories/dimension-repository";
 
 interface Param {
     screenX: string,
@@ -30,7 +31,16 @@ export default function CommandDialog(param: Param) {
     const [ history, setHistory ] = useState(getCommandHistory());
     const ref = useRef(null);
     useEffect(() => {
-            if (ref.current) {
+            const dimension = getDimension('dim_command-dialog');
+            if (dimension) {
+                setDialogLeft(dimension.left!);
+                setDialogTop(dimension.top!);
+                const newStyle = {
+                    left: dimension.left! + 'px',
+                    top: dimension.top! + 'px'
+                };
+                setStyle(newStyle);
+            } else if (ref.current) {
                 const elem: HTMLDivElement = ref.current!;
                 setDialogLeft(elem.offsetLeft);
                 setDialogTop(elem.offsetTop);
@@ -72,6 +82,7 @@ export default function CommandDialog(param: Param) {
             left: newLeft + 'px',
             top: newTop + 'px'
         });
+        updateDimension('dim_command-dialog', { left: newLeft, top: newTop, width: undefined, height: undefined });
     }, [param.screenX, param.screenY]);
 
     const onNewCommand = (command: Command) => {
