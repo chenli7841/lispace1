@@ -13,6 +13,7 @@ export default function HtmlEditor() {
     const [show, setShow] = useState(false);
     const [edit, setEdit] = useState(false);
     const [newInput, setNewInput] = useState('');
+    const [focusIndex, setFocusIndex] = useState(-1);
 
     useEffect(() => {
         subscribeToCommand(onNewCommand);
@@ -93,20 +94,42 @@ export default function HtmlEditor() {
     const getParagraphs = (paragraphs: string[]) => paragraphs
         .map((p, i) =>
             <p className='html-editor-paragraph'
-               onBlur={onUpdateParagraph(i)} onClick={onEditParagraph} contentEditable={false} key={i}>{p}</p>
+               onBlur={onUpdateParagraph(i)}
+               onClick={onEditParagraph}
+               onKeyDown={onOldParameterKeyDown(i)}
+               contentEditable={i=== focusIndex} key={i}
+               dangerouslySetInnerHTML={{__html: p}} />
         );
+
+    const onOldParameterKeyDown = (i: number) => (e: React.KeyboardEvent<HTMLParagraphElement>) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const past = file.paragraphs.slice(0, i + 1);
+            const later = file.paragraphs.slice(i + 1);
+            const allContent = updateFileContent(file.title, [...past, '', ...later]);
+            if (allContent) {
+                setFile({title: file.title, paragraphs: allContent!});
+            }
+            setFocusIndex(i+1);
+        }
+    };
 
     const onUpdateParagraph = (i: number) => (e: React.FormEvent<HTMLParagraphElement>) => {
         e.currentTarget.contentEditable = 'false';
         const newFile = {...file};
         newFile.paragraphs = [...file.paragraphs];
         newFile.paragraphs[i] = e.currentTarget.innerText;
+        e.currentTarget.innerHTML = e.currentTarget.innerText;
         updateFileContent(newFile.title, newFile.paragraphs);
         setFile(newFile);
     };
 
     const onEditParagraph = (e: React.FormEvent<HTMLParagraphElement>) => {
+        if (e.currentTarget.contentEditable !== 'true') {
+            e.currentTarget.innerText = e.currentTarget.innerHTML;
+        }
         e.currentTarget.contentEditable = 'true';
+        e.currentTarget.focus();
     };
 
     const onInputChange = (e: React.FormEvent<HTMLDivElement>) => {

@@ -18,3 +18,12 @@
 .html-editor-paragraph {
     outline: none;
 }
+
+.bold {
+    font-weight: 700;
+}
+
+.bash {
+    font-family: Consolas,monaco,monospace;
+    font-weight: 600;
+}
