@@ -1,7 +1,7 @@
 import {getFileContent} from "./file-repository";
 
 export interface Word {
-    article: string,
+    article: string | undefined,
     type: 'noun'|'verb'|'adjective',
     text: string | undefined,
     singular: string | undefined,
@@ -32,7 +32,6 @@ export const loadDictionary = (fileName: string) => {
 export const getRandomQuestion = (): Question | undefined => {
     if (totalLength === 0) return undefined;
     const index = Math.floor(Math.random() * totalLength);
-    console.log(index);
     if (index === totalLength) {
         return questions[index - 1];
     } else {

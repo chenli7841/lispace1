@@ -1,0 +1,20 @@
+.quiz-input-single-char {
+    width: 12px;
+    margin-right: 6px;
+    border: none;
+    border-bottom: 1px solid #222;
+    background: transparent;
+    outline: none;
+    text-align: center;
+    font-size: 16px;
+    font-family: "Arial", Helvetica, sans-serif, monospace;
+}
+
+.quiz-input-single-char-disabled {
+    width: 12px;
+    margin-right: 6px;
+    border: none;
+    background: transparent;
+    outline: none;
+    text-align: center;
+}

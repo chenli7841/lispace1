@@ -10,6 +10,8 @@ export enum CommandType {
     CLOSE,
     HIDEHISTORY,
     SHOWHISTORY,
+    GOTO,
+    NEXTIMAGE,
     UNKNOWN
 }
 
@@ -61,6 +63,11 @@ export const parseCommand = (command: string): Command => {
         return { type: CommandType.HIDEHISTORY, args: undefined };
     } else if (trimmed === "Show history") {
         return { type: CommandType.SHOWHISTORY, args: undefined };
+    } else if (trimmed.indexOf("Go to ") === 0) {
+        const place = trimmed.replace("Go to ", "").trim();
+        return { type: CommandType.GOTO, args: place };
+    } else if (trimmed === 'Next') {
+        return { type: CommandType.NEXTIMAGE, args: undefined };
     }
     return { type: CommandType.UNKNOWN, args: undefined };
 };
@@ -74,7 +81,8 @@ export const sampleCommand = [
     'List file names',
     'Close',
     'Hide history',
-    'Show history'
+    'Show history',
+    'Go to Hamburg'
 ];
 
 const commandSubscribers: Array<(command: Command) => any> = [];
@@ -89,9 +97,11 @@ export const subscribeToCommandHistory = (subscriber: (commandHistory: CommandTe
 };
 
 export const submitCommand = (command: CommandText) => {
-    addCommand(command);
-    if (command.type === 'response') return;
     const parsedCommand: Command = parseCommand(command.text);
+    if (parsedCommand.type !== CommandType.NEXTIMAGE) {
+        addCommand(command);
+    }
+    if (command.type === 'response') return;
     commandSubscribers.forEach((subscriber: ((command: Command) => any)) => {
         subscriber(parsedCommand);
     });
