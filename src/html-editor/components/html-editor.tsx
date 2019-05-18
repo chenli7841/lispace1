@@ -1,11 +1,16 @@
 import React, {useEffect, useState} from 'react';
 import './html-editor.css';
 import {Command, CommandType, getLastCommand, subscribeToCommand} from "../../services/command-service";
-import {addNewFile, File, getFileContent, updateFileContent} from "../../repositories/file-repository";
+import {
+    addNewFile,
+    File,
+    getFileContent,
+    updateFileContent
+} from "../../repositories/file-repository";
 
 export default function HtmlEditor() {
 
-    const [file, setFile] = useState({title: '', paragraphs: []} as File);
+    const [file, setFile] = useState({title: '', paragraphs: []} as File<string[]>);
     const [top, setTop] = useState(40);
     const [left, setLeft] = useState(40);
     const [width, setWidth] = useState(400);
@@ -22,7 +27,7 @@ export default function HtmlEditor() {
         if (lastCommand) {
             switch (lastCommand.type) {
                 case CommandType.OPEN:
-                    if (lastCommand.args.ext === undefined || lastCommand.args.ext === 'txt') {
+                    if (lastCommand.args.ext === undefined || lastCommand.args.ext === 'txt' || lastCommand.args.ext === 'dict') {
                         paragraphs = getFileContent(lastCommand.args.fileName);
                         if (paragraphs) {
                             setShow(true);
@@ -37,11 +42,13 @@ export default function HtmlEditor() {
                     setHeight(lastCommand.args.height);
                     break;
                 case CommandType.EDIT:
-                    paragraphs = getFileContent(lastCommand.args.fileName);
-                    if (paragraphs) {
-                        setFile({title: lastCommand.args.fileName, paragraphs: paragraphs!});
-                        setEdit(true);
-                        setShow(true);
+                    if (lastCommand.args.ext === undefined || lastCommand.args.ext === 'txt' || lastCommand.args.ext === 'dict') {
+                        paragraphs = getFileContent(lastCommand.args.fileName);
+                        if (paragraphs) {
+                            setFile({title: lastCommand.args.fileName, paragraphs: paragraphs!});
+                            setEdit(true);
+                            setShow(true);
+                        }
                     }
                     break;
                 case CommandType.CLOSE:
@@ -56,13 +63,15 @@ export default function HtmlEditor() {
         let paragraphs: string[] | undefined = undefined;
         switch (command.type) {
             case CommandType.CREATE:
-                addNewFile({title: command.args.fileName, paragraphs: []});
-                setFile({title: command.args.fileName, paragraphs: []});
-                setEdit(true);
-                setShow(true);
+                if (command.args.ext === undefined || command.args.ext === 'txt' || command.args.ext === 'dict') {
+                    addNewFile({title: command.args.fileName, paragraphs: []});
+                    setFile({title: command.args.fileName, paragraphs: []});
+                    setEdit(true);
+                    setShow(true);
+                }
                 break;
             case CommandType.OPEN:
-                if (command.args.ext === undefined || command.args.ext === 'txt') {
+                if (command.args.ext === undefined || command.args.ext === 'txt' || command.args.ext === 'dict') {
                     paragraphs = getFileContent(command.args.fileName);
                     if (paragraphs) {
                         setFile({title: command.args.fileName, paragraphs: paragraphs!});
@@ -72,11 +81,13 @@ export default function HtmlEditor() {
                 }
                 break;
             case CommandType.EDIT:
-                paragraphs = getFileContent(command.args.fileName);
-                if (paragraphs) {
-                    setFile({title: command.args.fileName, paragraphs: paragraphs!});
-                    setEdit(true);
-                    setShow(true);
+                if (command.args.ext === undefined || command.args.ext === 'txt' || command.args.ext === 'dict') {
+                    paragraphs = getFileContent(command.args.fileName);
+                    if (paragraphs) {
+                        setFile({title: command.args.fileName, paragraphs: paragraphs!});
+                        setEdit(true);
+                        setShow(true);
+                    }
                 }
                 break;
             case CommandType.SETWIDTH:
@@ -138,8 +149,7 @@ export default function HtmlEditor() {
     };
 
     const onTypeEnter = (e: React.KeyboardEvent<HTMLDivElement>) => {
-        const event: any = e.nativeEvent;
-        if (event.key !== 'Enter') return;
+        if (e.key !== 'Enter') return;
         e.nativeEvent.preventDefault();
         if (newInput.trim() === '') return;
         const allContent = updateFileContent(file.title, [...file.paragraphs, newInput]);

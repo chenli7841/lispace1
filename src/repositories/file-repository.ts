@@ -1,6 +1,6 @@
-export interface File {
+export interface File<T> {
     title: string,
-    paragraphs: string[]
+    paragraphs: T
 }
 
 export const getFileNames = (): string[] => {
@@ -12,7 +12,7 @@ export const getFileKeys = (): string[] => {
     return JSON.parse(window.localStorage['fileNames'] || '[]');
 };
 
-export const addNewFile = (file: File) => {
+export const addNewFile = (file: File<any>) => {
     const fileNames = getFileKeys();
     if (fileNames.indexOf('file_' + file.title) >= 0) {
         console.error(`Error: File ${file.title} exists already.`);
@@ -32,7 +32,7 @@ export const getFileContent = (fileName: string): string[] | undefined => {
     }
 };
 
-export const updateFileContent = (fileName: string, content: string[]): string[] | undefined => {
+export function updateFileContent<T>(fileName: string, content: T[]): T[] | undefined {
     const file = window.localStorage.getItem('file_' + fileName);
     if (file) {
         window.localStorage.setItem('file_' + fileName, JSON.stringify(content));
@@ -40,4 +40,4 @@ export const updateFileContent = (fileName: string, content: string[]): string[]
     } else {
         return undefined;
     }
-};
+}

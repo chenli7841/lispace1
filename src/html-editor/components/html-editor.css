@@ -27,3 +27,25 @@
     font-family: Consolas,monaco,monospace;
     font-weight: 600;
 }
+
+.key {
+    font-weight: 600;
+    color: #008000;
+}
+
+.import {
+    font-weight: 600;
+    color: #0000FF;
+}
+
+.code {
+    font-family: Consolas,Monaco,monospace;
+}
+
+.function {
+    color: #0000FF;
+}
+
+.literal {
+    color: #BA2121;
+}

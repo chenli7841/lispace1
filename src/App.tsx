@@ -11,6 +11,7 @@ import {
   setCategoryStore,
   setImageIndexStore
 } from "./repositories/image-repository";
+import VerseNoteEditor from "./verse-note-editor/components/verse-note-editor";
 
 export default function App() {
 
@@ -65,6 +66,7 @@ export default function App() {
   onDrop={onDrop}>
     <HtmlEditor />
     <WordCardEditor />
+    <VerseNoteEditor />
     <CommandDialog screenX={screenX} screenY={screenY}/>
   </div>
 }
